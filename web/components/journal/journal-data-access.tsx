@@ -21,7 +21,7 @@ export function useJournalProgram() {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const provider = useAnchorProvider();
-  const programId = new PublicKey("8sddtWW1q7fwzspAfZj4zNpeQjpvmD3EeCCEfnc3JnuP");
+  const programId = new PublicKey("Gsj1v2gR48zAMDV96SKWigPT4w1k35HFJ1oNZrSPHq9V");
   const program = new Program(JournalIDL, programId, provider);
 
   const accounts = useQuery({
@@ -71,7 +71,7 @@ export function useJournalProgramAccount({ account }: { account: PublicKey }) {
   const { cluster } = useCluster();
   const transactionToast = useTransactionToast();
   const { program, accounts } = useJournalProgram();
-  const programId = new PublicKey("8sddtWW1q7fwzspAfZj4zNpeQjpvmD3EeCCEfnc3JnuP");
+  const programId = new PublicKey("Gsj1v2gR48zAMDV96SKWigPT4w1k35HFJ1oNZrSPHq9V");
 
   const accountQuery = useQuery({
     queryKey: ['journal', 'fetch', { cluster, account }],
