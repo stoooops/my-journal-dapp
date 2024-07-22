@@ -11,7 +11,7 @@ declare_id!("7AGmMcgd1SjoMsCcXAAYwRgB9ihCyM8cZqjsUqriNRQt");
 #[program]
 pub mod journal {
     use super::*;
-    
+
     /// Creates a new journal entry.
     ///
     /// # Arguments
@@ -43,6 +43,38 @@ pub mod journal {
         // Set the title and message of the journal entry.
         journal_entry.title = title;
         journal_entry.message = message;
+        Ok(())
+    }
+
+    /// Updates an existing journal entry.
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx` - The context containing the accounts involved in the transaction.
+    /// * `title` - The new title of the journal entry.
+    /// * `message` - The new message of the journal entry.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<()>` - Returns an empty result on success.
+    ///
+    /// This function updates the message of an existing journal entry account with the provided message.
+    /// It logs the update of the entry.
+    pub fn update_journal_entry(
+        ctx: Context<UpdateEntry>,
+        title: String,
+        message: String,
+    ) -> Result<()> {
+        // Log messages to the Solana runtime, useful for debugging.
+        msg!("Journal Entry Updated");
+        msg!("Title: {}", title);
+        msg!("Message: {}", message);
+
+        // Access the mutable reference to the journal entry account.
+        let journal_entry = &mut ctx.accounts.journal_entry;
+        // Update the message of the journal entry.
+        journal_entry.message = message;
+
         Ok(())
     }
 }
@@ -88,6 +120,35 @@ pub struct CreateEntry<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
     /// The system program required for account creation.
+    /// This is a built-in program that provides basic account management functionalities.
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(title: String, message: String)]
+pub struct UpdateEntry<'info> {
+    /// The account to be updated for the journal entry.
+    ///
+    /// - `mut`: The account is mutable, meaning it can be modified.
+    /// - `seeds`: A unique identifier for the account, derived from the title and owner's public key.
+    /// - `bump`: A nonce used to ensure the uniqueness of the derived address.
+    /// - `realloc`: Reallocates the account with the new size.
+    /// - `realloc::payer`: The account that will pay for the reallocation.
+    /// - `realloc::zero`: Ensures the newly allocated space is zeroed out.
+    #[account(
+        mut,
+        seeds = [title.as_bytes(), owner.key().as_ref()],
+        bump,
+        realloc = 8 + 32 + 1 + 4 + title.len() + 4 + message.len(),
+        realloc::payer = owner,
+        realloc::zero = true,
+    )]
+    pub journal_entry: Account<'info, JournalEntryState>,
+    /// The signer of the transaction.
+    /// This account must sign the transaction to authorize it.
+    #[account(mut)]
+    pub owner: Signer<'info>,
+    /// The system program required for account reallocation.
     /// This is a built-in program that provides basic account management functionalities.
     pub system_program: Program<'info, System>,
 }
