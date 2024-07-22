@@ -77,6 +77,26 @@ pub mod journal {
 
         Ok(())
     }
+
+    /// Deletes an existing journal entry.
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx` - The context containing the accounts involved in the transaction.
+    /// * `title` - The title of the journal entry to be deleted.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<()>` - Returns an empty result on success.
+    ///
+    /// This function deletes an existing journal entry account.
+    /// It logs the deletion of the entry.
+    pub fn delete_journal_entry(ctx: Context<DeleteEntry>, title: String) -> Result<()> {
+        // Log the deletion message to the Solana runtime, useful for debugging.
+        msg!("Journal entry titled {} deleted", title);
+
+        Ok(())
+    }
 }
 
 /// Represents the state of a journal entry.
@@ -149,6 +169,31 @@ pub struct UpdateEntry<'info> {
     #[account(mut)]
     pub owner: Signer<'info>,
     /// The system program required for account reallocation.
+    /// This is a built-in program that provides basic account management functionalities.
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(title: String)]
+pub struct DeleteEntry<'info> {
+    /// The account to be deleted for the journal entry.
+    ///
+    /// - `mut`: The account is mutable, meaning it can be modified.
+    /// - `seeds`: A unique identifier for the account, derived from the title and owner's public key.
+    /// - `bump`: A nonce used to ensure the uniqueness of the derived address.
+    /// - `close`: Closes the account and transfers the remaining lamports to the specified account.
+    #[account(
+        mut,
+        seeds = [title.as_bytes(), owner.key().as_ref()],
+        bump,
+        close = owner,
+    )]
+    pub journal_entry: Account<'info, JournalEntryState>,
+    /// The signer of the transaction.
+    /// This account must sign the transaction to authorize it.
+    #[account(mut)]
+    pub owner: Signer<'info>,
+    /// The system program required for account closure.
     /// This is a built-in program that provides basic account management functionalities.
     pub system_program: Program<'info, System>,
 }
