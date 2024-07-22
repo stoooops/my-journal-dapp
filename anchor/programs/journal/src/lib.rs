@@ -1,9 +1,9 @@
 /// Imports necessary items from the Anchor framework.
 use anchor_lang::prelude::*;
 
-/// This is your program's public key and it will update automatically when you build the project.
-/// The `declare_id!` macro sets the program's unique identifier, which is essential for deploying
-/// and interacting with the program on the Solana blockchain.
+// This is your program's public key and it will update automatically when you build the project.
+// The `declare_id!` macro sets the program's unique identifier, which is essential for deploying
+// and interacting with the program on the Solana blockchain.
 declare_id!("7AGmMcgd1SjoMsCcXAAYwRgB9ihCyM8cZqjsUqriNRQt");
 
 /// The main program module for the journal.
@@ -91,6 +91,7 @@ pub mod journal {
     ///
     /// This function deletes an existing journal entry account.
     /// It logs the deletion of the entry.
+    #[allow(unused_variables)]
     pub fn delete_journal_entry(ctx: Context<DeleteEntry>, title: String) -> Result<()> {
         // Log the deletion message to the Solana runtime, useful for debugging.
         msg!("Journal entry titled {} deleted", title);
