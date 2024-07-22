@@ -1,6 +1,6 @@
 'use client';
 
-import { JournalIDL } from '@journal/anchor';
+import { JournalIDL } from '@my-journal-dapp/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { useConnection } from '@solana/wallet-adapter-react';
 import { PublicKey } from '@solana/web3.js';
