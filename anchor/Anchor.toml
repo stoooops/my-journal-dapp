@@ -5,7 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-journal = "Gsj1v2gR48zAMDV96SKWigPT4w1k35HFJ1oNZrSPHq9V"
+journal = "4yt2ZeKvCQYGKCnG8WoibHSebf5d5pGZWCeALTHMZZ71"
 
 [registry]
 url = "https://api.apr.dev"

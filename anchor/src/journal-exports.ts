@@ -8,7 +8,7 @@ export { Journal, JournalIDL };
 
 // After updating your program ID (e.g. after running `anchor keys sync`) update the value below.
 export const JOURNAL_PROGRAM_ID = new PublicKey(
-  'Gsj1v2gR48zAMDV96SKWigPT4w1k35HFJ1oNZrSPHq9V'
+  '4yt2ZeKvCQYGKCnG8WoibHSebf5d5pGZWCeALTHMZZ71'
 );
 
 // This is a helper function to get the program ID for the Journal program depending on the cluster.

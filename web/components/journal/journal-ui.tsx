@@ -96,6 +96,11 @@ export function JournalList() {
   );
 }
 
+type JournalEntryState = {
+  message: string;
+  title: string;
+}
+
 function JournalCard({ account }: { account: PublicKey }) {
   const {
     accountQuery,
@@ -104,7 +109,7 @@ function JournalCard({ account }: { account: PublicKey }) {
   } = useJournalProgramAccount({ account });
   const { publicKey } = useWallet();
   const [message, setMessage] = useState('');
-  const title = accountQuery.data?.title; 
+  const title = (accountQuery.data as JournalEntryState)?.title; 
 
   const isFormValid = message.trim() !== '';
 
@@ -128,10 +133,10 @@ function JournalCard({ account }: { account: PublicKey }) {
             className="card-title justify-center text-3xl cursor-pointer"
             onClick={() => accountQuery.refetch()}
           >
-            {accountQuery.data?.title}
+            {(accountQuery.data as JournalEntryState)?.title}
           </h2>
           <p> 
-          {accountQuery.data?.message}
+          {(accountQuery.data as JournalEntryState)?.message}
           </p>
           <div className="card-actions justify-around">
             <textarea
@@ -165,7 +170,7 @@ function JournalCard({ account }: { account: PublicKey }) {
                 ) {
                   return;
                 }
-                const title = accountQuery.data?.title;
+                const title = (accountQuery.data as JournalEntryState)?.title;
                 if (title) {
                   return deleteEntry.mutateAsync(title);
                 }

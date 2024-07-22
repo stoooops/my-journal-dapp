@@ -10,6 +10,7 @@ import { JournalCreate, JournalList } from './journal-ui';
 export default function JournalFeature() {
   const { publicKey } = useWallet();
   const { programId } = useJournalProgram();
+  console.log('programId', programId.toString());
 
   return publicKey ? (
     <div>

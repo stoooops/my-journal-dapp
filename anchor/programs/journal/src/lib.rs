@@ -4,7 +4,7 @@ use anchor_lang::prelude::*;
 // This is your program's public key and it will update automatically when you build the project.
 // The `declare_id!` macro sets the program's unique identifier, which is essential for deploying
 // and interacting with the program on the Solana blockchain.
-declare_id!("Gsj1v2gR48zAMDV96SKWigPT4w1k35HFJ1oNZrSPHq9V");
+declare_id!("4yt2ZeKvCQYGKCnG8WoibHSebf5d5pGZWCeALTHMZZ71");
 
 /// The main program module for the journal.
 /// The `#[program]` attribute macro defines the entry points for the Solana program.
