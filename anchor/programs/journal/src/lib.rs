@@ -1,70 +1,93 @@
-#![allow(clippy::result_large_err)]
-
+/// Imports necessary items from the Anchor framework.
 use anchor_lang::prelude::*;
 
-declare_id!("Gx3nTwx8L8k7t4f7df5KjaGqFD7JB3eWRUzPq99HpWYG");
+/// This is your program's public key and it will update automatically when you build the project.
+/// The `declare_id!` macro sets the program's unique identifier, which is essential for deploying
+/// and interacting with the program on the Solana blockchain.
+declare_id!("7AGmMcgd1SjoMsCcXAAYwRgB9ihCyM8cZqjsUqriNRQt");
 
+/// The main program module for the journal.
+/// The `#[program]` attribute macro defines the entry points for the Solana program.
 #[program]
-pub mod counter {
+pub mod journal {
     use super::*;
+    
+    /// Creates a new journal entry.
+    ///
+    /// # Arguments
+    ///
+    /// * `ctx` - The context containing the accounts involved in the transaction.
+    /// * `title` - The title of the journal entry.
+    /// * `message` - The message of the journal entry.
+    ///
+    /// # Returns
+    ///
+    /// * `Result<()>` - Returns an empty result on success.
+    ///
+    /// This function initializes a new journal entry account with the provided title and message.
+    /// It logs the creation of the entry and assigns the owner's public key to the entry.
+    pub fn create_journal_entry(
+        ctx: Context<CreateEntry>,
+        title: String,
+        message: String,
+    ) -> Result<()> {
+        // Log messages to the Solana runtime, useful for debugging.
+        msg!("Journal Entry Created");
+        msg!("Title: {}", title);
+        msg!("Message: {}", message);
 
-  pub fn close(_ctx: Context<CloseCounter>) -> Result<()> {
-    Ok(())
-  }
-
-  pub fn decrement(ctx: Context<Update>) -> Result<()> {
-    ctx.accounts.counter.count = ctx.accounts.counter.count.checked_sub(1).unwrap();
-    Ok(())
-  }
-
-  pub fn increment(ctx: Context<Update>) -> Result<()> {
-    ctx.accounts.counter.count = ctx.accounts.counter.count.checked_add(1).unwrap();
-    Ok(())
-  }
-
-  pub fn initialize(_ctx: Context<InitializeCounter>) -> Result<()> {
-    Ok(())
-  }
-
-  pub fn set(ctx: Context<Update>, value: u8) -> Result<()> {
-    ctx.accounts.counter.count = value.clone();
-    Ok(())
-  }
+        // Access the mutable reference to the journal entry account.
+        let journal_entry = &mut ctx.accounts.journal_entry;
+        // Set the owner of the journal entry to the public key of the transaction signer.
+        journal_entry.owner = ctx.accounts.owner.key();
+        // Set the title and message of the journal entry.
+        journal_entry.title = title;
+        journal_entry.message = message;
+        Ok(())
+    }
 }
 
-#[derive(Accounts)]
-pub struct InitializeCounter<'info> {
-  #[account(mut)]
-  pub payer: Signer<'info>,
-
-  #[account(
-  init,
-  space = 8 + Counter::INIT_SPACE,
-  payer = payer
-  )]
-  pub counter: Account<'info, Counter>,
-  pub system_program: Program<'info, System>,
-}
-#[derive(Accounts)]
-pub struct CloseCounter<'info> {
-  #[account(mut)]
-  pub payer: Signer<'info>,
-
-  #[account(
-  mut,
-  close = payer, // close account and return lamports to payer
-  )]
-  pub counter: Account<'info, Counter>,
-}
-
-#[derive(Accounts)]
-pub struct Update<'info> {
-  #[account(mut)]
-  pub counter: Account<'info, Counter>,
-}
-
+/// Represents the state of a journal entry.
+/// The `#[account]` attribute macro defines a struct that will be stored on-chain.
+/// The `#[derive(InitSpace)]` attribute macro is used to initialize the account with a space of 8 bytes.
 #[account]
 #[derive(InitSpace)]
-pub struct Counter {
-  count: u8,
+pub struct JournalEntryState {
+    /// The public key of the owner of the journal entry.
+    pub owner: Pubkey,
+    /// The title of the journal entry. Maximum length is 50 characters.
+    #[max_len(50)]
+    pub title: String,
+    /// The message of the journal entry. Maximum length is 1000 characters.
+    #[max_len(1000)]
+    pub message: String,
+}
+
+/// The context for the `create_journal_entry` function.
+/// The `#[derive(Accounts)]` attribute macro defines the accounts required for the function.
+#[derive(Accounts)]
+#[instruction(title: String, message: String)]
+pub struct CreateEntry<'info> {
+    /// The account to be created or initialized for the journal entry.
+    ///
+    /// - `init_if_needed`: Initializes the account if it doesn't already exist.
+    /// - `seeds`: A unique identifier for the account, derived from the title and owner's public key.
+    /// - `bump`: A nonce used to ensure the uniqueness of the derived address.
+    /// - `payer`: The account that will pay for the account creation.
+    /// - `space`: The amount of space to allocate for the account.
+    #[account(
+        init_if_needed,
+        seeds = [title.as_bytes(), owner.key().as_ref()],
+        bump,
+        payer = owner,
+        space = 8 + JournalEntryState::INIT_SPACE
+    )]
+    pub journal_entry: Account<'info, JournalEntryState>,
+    /// The signer of the transaction.
+    /// This account must sign the transaction to authorize it.
+    #[account(mut)]
+    pub owner: Signer<'info>,
+    /// The system program required for account creation.
+    /// This is a built-in program that provides basic account management functionalities.
+    pub system_program: Program<'info, System>,
 }
