@@ -7,6 +7,9 @@ skip-lint = false
 [programs.localnet]
 journal = "4yt2ZeKvCQYGKCnG8WoibHSebf5d5pGZWCeALTHMZZ71"
 
+[programs.devnet]
+journal = "4yt2ZeKvCQYGKCnG8WoibHSebf5d5pGZWCeALTHMZZ71"
+
 [registry]
 url = "https://api.apr.dev"
 
